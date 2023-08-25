@@ -1,12 +1,8 @@
 class VpdchartCard extends HTMLElement {
 
-    crops = {
-      "cannabis": 0,
-      "tomatoes": 1,
-      "leafy greens": 5,
-      "cucumber": 6
-    }
-  
+  crops = [0,1,2,3,4,5,6]
+  tempUnits = ["C", "F"]
+    
     set hass(hass) {
       const airRh = this.config.air_rh;
       const airRhState = hass.states[airRh];
@@ -17,10 +13,8 @@ class VpdchartCard extends HTMLElement {
       const leafTemp = this.config.leaf_temp;
       const leafTempState = hass.states[leafTemp];
       const leafTempVal = leafTempState ? leafTempState.state : "unavailable";
-      const tempUnit = airTempState.attributes.unit_of_measurement.replace("°","");
-  
-      const crop = this.config.crop.toLowerCase();
-      const cropId = this.crops[crop];
+      const tempUnit = this.config.temp_unit;
+      const cropId = this.config.crop;
   
       if (!this.iframe) {
         let chartTitle = "";
@@ -83,9 +77,17 @@ class VpdchartCard extends HTMLElement {
       if (!config.crop) {
         throw new Error('You need to define crop');
       } else {
-        const crop = config.crop.toLowerCase();
+        const crop = config.crop;
         if (!(crop in this.crops)) {
-            throw new Error('You need to define crop as "Cannabis", "Tomatoes", "Leafy greens" or "Cucumber"');
+            throw new Error('You need to define crop as "0, 1, 2, 3, 4, 5 or 6"');
+        }
+      }
+      if (!config.temp_unit) {
+        throw new Error('You need to define temp_unit');
+      } else {
+        const tempUnit = config.temp_unit.toUpperCase();
+        if (tempUnits.includes(tempUnit)) {
+            throw new Error('You need to define temp_unit as "\'C\' or \'F\'"');
         }
       }
       if (!config.air_rh) {
